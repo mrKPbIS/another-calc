@@ -1,0 +1,194 @@
+<html>
+
+<head>
+  <style>
+    .bordered {
+                border-width: 1px;
+                border-style: solid;
+                border-color: black;
+            }
+
+            #expr {
+                width: 446px;
+                height: 142px;
+                font-family: inherit;
+                text-align:  right;
+                padding: 0px;
+            }
+
+            #c {
+                position:absolute;
+                left: 483px;
+            }
+
+            #calc {
+                padding: 15px;
+                width: 600px;
+                height: 750px;
+                font-family: 'Courier New', Courier, monospace;
+                line-height: 138px;
+                font-size: 138px;
+            }
+
+            .block {
+                width: inherit;
+                padding:5px;
+            }
+
+            .btn-row {
+                width: inherit;
+                padding-top: 1px;
+            }
+
+            .btn {
+                width: 140px;
+                height: 140px;
+                display: inline-block;
+                text-align: center;
+            }
+
+
+        </style>
+  <title>
+    Another Calculator
+  </title>
+</head>
+
+<body>
+  <div id="calc" class="bordered">
+    <div class="block">
+      <input id="expr" class="bordered" type="text" readonly></input>
+      <div id="c" class="btn bordered">C</div>
+    </div>
+    <div id="ctrls" class="block">
+      <div class="btn-row">
+        <div class="btn bordered" isNumber>7</div>
+        <div class="btn bordered" isNumber>8</div>
+        <div class="btn bordered" isNumber>9</div>
+        <div class="btn bordered">+</div>
+      </div>
+      <div class="btn-row">
+        <div class="btn bordered" isNumber>4</div>
+        <div class="btn bordered" isNumber>5</div>
+        <div class="btn bordered" isNumber>6</div>
+        <div class="btn bordered">-</div>
+      </div>
+      <div class="btn-row">
+        <div class="btn bordered" isNumber>1</div>
+        <div class="btn bordered" isNumber>2</div>
+        <div class="btn bordered" isNumber>3</div>
+        <div class="btn bordered">*</div>
+      </div>
+      <div class="btn-row">
+        <div class="btn bordered">=</div>
+        <div class="btn bordered" isNumber>0</div>
+        <div class="btn bordered" isNumber>.</div>
+        <div class="btn bordered">/</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var expr = document.getElementById('expr');
+    var currentNumber;
+    var calculatedNumber;
+    var currentOperato;
+    var isDecimal;
+
+    const numbers = '01234567890.';
+    const operators = '+-=*/C';
+
+    const reset = _ => {
+      currentNumber = '';
+      calculatedNumber = '';
+      currentOperator = '=';
+      isDecimal = false;
+    }
+
+    reset();
+
+    const addNumber = number => {
+      if (number == '.') {
+        if (!isDecimal) {
+          isDecimal = true;
+        }
+        else {
+          return;
+        }
+      }
+      currentNumber = currentNumber.concat(number);
+    };
+
+    const prettyResult = number => parseFloat(number.toFixed(10));
+
+    const addOperator = operator => {
+      if (currentOperator == '=') {
+        calculatedNumber = currentNumber;
+      } else {
+        switch (currentOperator) {
+          case '+': {
+            calculatedNumber = prettyResult(Number(calculatedNumber) + Number(currentNumber));
+            break;
+          }
+          case '-': {
+            calculatedNumber = prettyResult(Number(calculatedNumber) - Number(currentNumber));
+            break;
+          }
+          case '*': {
+            calculatedNumber = prettyResult(Number(calculatedNumber) * Number(currentNumber));
+            break;
+          }
+          case '/': {
+            calculatedNumber = prettyResult(Number(calculatedNumber) / Number(currentNumber));
+            break;
+          }
+        }
+      }
+      if (operator == '=') {
+        currentNumber = calculatedNumber;
+        currentOperator = operator;
+      } else if (operator == 'C') {
+        reset();
+      } else {
+        currentNumber = '';
+        isDecimal = false;
+        currentOperator = operator;
+      }
+    }
+
+    const updateExpr = _ => {
+      expr.value = currentNumber;
+    }
+
+    document.addEventListener('click', e => {
+      var { target } = e;
+      var { className } = target;
+      if (className == 'btn bordered') {
+        var value = target.innerText;
+        var isNumber = target.hasAttribute('isnumber');
+        if (isNumber) {
+          addNumber(value);
+          updateExpr();
+        } else {
+          addOperator(value);
+          updateExpr();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      var { key } = e;
+      key = key.toUpperCase();
+      if (numbers.indexOf(key) != -1) {
+        addNumber(key);
+        updateExpr();
+      } else if (operators.indexOf(key) != -1) {
+        addOperator(key);
+        updateExpr();
+      }
+    });
+    
+  </script>
+</body>
+
+</html>
